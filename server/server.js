@@ -30,6 +30,10 @@ io.on("connection", (socket) => {
     io.emit("chat message", message); // Broadcast the message to all connected clients
   });
 
+  socket.on("click added", (message) => {
+    io.emit("click added", message); // Broadcast the message to all connected clients
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });

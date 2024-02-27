@@ -7,6 +7,7 @@ const socket = io("http://localhost:3001");
 
 export default function HomePage() {
   const [messages, setMessages] = useState<string[]>([]);
+  const [clicks, setClicks] = useState<number>(0);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
@@ -15,17 +16,27 @@ export default function HomePage() {
       setMessages((prevMessages) => [...prevMessages, message]);
     };
 
+    const handleNewClick = (click: number) => {
+      setClicks((prevClicks) => prevClicks + click);
+    };
+
     socket.on("chat message", handleNewMessage);
+    socket.on("click added", handleNewClick);
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("chat message", handleNewMessage);
+      socket.off("click added", handleNewClick);
     };
   }, []);
 
   const sendMessage = () => {
     socket.emit("chat message", newMessage);
     setNewMessage("");
+  };
+
+  const sendClick = () => {
+    socket.emit("click added", 1);
   };
 
   return (
@@ -47,6 +58,15 @@ export default function HomePage() {
             onChange={(e) => setNewMessage(e.target.value)}
           />
           <button onClick={sendMessage}>Send</button>
+
+          <button onClick={sendClick} className="rounded-lg bg-sky-700 p-4">
+            Waiting for {4 - clicks} clicks
+          </button>
+          {clicks <= 3 ? (
+            <p>There are currently {clicks} clicks</p>
+          ) : (
+            <p>All clicked, team wins!</p>
+          )}
         </div>
       </div>
     </main>
