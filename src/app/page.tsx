@@ -6,14 +6,21 @@ import { useState, useEffect } from "react";
 const socket = io("http://localhost:3001");
 
 export default function HomePage() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     // Listen for incoming messages
-    socket.on("chat message", (message) => {
+    const handleNewMessage = (message: string) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    };
+
+    socket.on("chat message", handleNewMessage);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      socket.off("chat message", handleNewMessage);
+    };
   }, []);
 
   const sendMessage = () => {
