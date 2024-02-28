@@ -34,6 +34,10 @@ io.on("connection", (socket) => {
     io.emit("click added", message); // Broadcast the message to all connected clients
   });
 
+  socket.on("mousePos", (x, y) => {
+    io.emit("mousPos", x, y); // Broadcast the message to all connected clients
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });
